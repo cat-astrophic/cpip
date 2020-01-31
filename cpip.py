@@ -1,4 +1,4 @@
-# This function solves any non-linear integer program of the form in the accompanying paper
+# This function identifies the core of a network in a core-periphery analysis with integer programming via pulp
 
 # Import required modules
     
@@ -20,13 +20,6 @@ def cpip(filepath, theta, psi):
     # Read in the data set
     
     W = pd.read_csv(filepath)
-    
-    # Standardizes (at least most) naming conventions with pulp
-    
-    for col in W.columns:
-        
-        col = col.replace(' ', '_')
-        col = col.replace('-', '_')
     
     # Remove all isolated vertices from the data set to be safe
     
@@ -185,7 +178,11 @@ def cpip(filepath, theta, psi):
                     
                     if pulp.value(prob.objective) > val:
                         
-                        val, core = pulp.value(prob.objective), [str(v) for v in prob.variables() if v.varValue > 0]        
-
+                        val, core = pulp.value(prob.objective), [str(v) for v in prob.variables() if v.varValue > 0]
+                        
+        # Update names elements in core to match original format and return core
+        
+        core = [c.replace('_', ' ') for c in core]
+        
         return core
 
