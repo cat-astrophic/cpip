@@ -1,5 +1,7 @@
 # This function identifies the core of a network in a core-periphery analysis with integer programming via pulp
 
+# The input must be a weighted adjacency matrix for a network, hence the input need not be symmetric (e.g., directed networks)
+
 # Import required modules
     
 import pulp
