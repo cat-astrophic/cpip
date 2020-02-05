@@ -106,7 +106,7 @@ def cpip(filepath, theta, psi):
         
     # Continue this process if the first stage optimization problem yields at least two potential members of the core
 
-    if len(subset) < 2:
+    if (len(subset) < 2) or (theta == 1):
         
         return subset
     
