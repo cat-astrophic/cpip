@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import networkx as nx
 import itertools as it
+from matplotlib import pyplot as plt
 
 ####################################################################################################
 
@@ -285,4 +286,112 @@ def cpip_exploratory(filepath, theta):
             subset.append(str(var).replace('_', ' '))
         
     return subset
+
+####################################################################################################
+
+# Creating a class for the cpip_viz function
+
+class network_object():
+    
+    pass
+
+####################################################################################################
+
+# Visualization function
+
+def cpip_viz(filepath, core):
+    
+    # Read in the network data for the full network
+    
+    W = pd.read_csv(filepath)
+    
+    # Create the core and periphery of the network
+    
+    c_ids = [list(W.columns).index(c) for c in core]
+    p_ids = [i for i in range(len(W.columns)) if W.columns[i] not in core]
+    C = W
+    P = W
+    
+    for c in [c_ids[len(c_ids)-1-i] for i in range(len(c_ids))]:
+        
+        P = P.drop(P.columns[c], axis = 1).drop(c, axis = 0)
+    
+    for p in [p_ids[len(p_ids)-1-i] for i in range(len(p_ids))]:
+        
+        C = C.drop(C.columns[p], axis = 1).drop(p, axis = 0)
+    
+    # Create and display the network, its core, and the periphery
+    
+    net_graph = nx.Graph(W.values)
+    core_graph = nx.Graph(C.values)
+    peri_graph = nx.Graph(P.values)
+    
+    print('THE ENTIRE NETWORK')
+    plt.figure()
+    nx.draw_circular(net_graph)
+    
+    print('THE CORE OF THE NETWORK')
+    plt.figure()
+    nx.draw_circular(core_graph, labels = dict(zip([i for i in range(len(core))],core)))
+    
+    print('THE PERIPHERY OF THE NETWORK')
+    plt.figure()
+    nx.draw_circular(peri_graph)
+    
+    # Preparing some arrays of binary adjacency matrices for generating function outputs
+    
+    M = W.values
+    MC = C.values
+    MP = P.values
+    
+    for row in range(len(M)):
+        
+        for col in range(len(M)):
+            
+            if W.values[row][col] > 0:
+                
+                M[row][col] = 1
+    
+    for row in range(len(C)):
+        
+        for col in range(len(C)):
+            
+            if C.values[row][col] > 0:
+                
+                MC[row][col] = 1
+    
+    for row in range(len(P)):
+        
+        for col in range(len(P)):
+            
+            if P.values[row][col] > 0:
+                
+                MP[row][col] = 1
+                            
+    # Creating the output
+    
+    output = network_object()
+    output.network = network_object()
+    output.network.data = W
+    output.network.viz = net_graph
+    output.core = network_object()
+    output.core.data = C
+    output.core.viz = core_graph
+    output.periphery = network_object()
+    output.periphery.data = P
+    output.periphery.viz = peri_graph
+    output.core_size = len(c_ids)
+    output.core_ratio = len(c_ids) / (len(c_ids) + len(p_ids))
+    output.edges_network = sum(sum(M)) / 2
+    output.edges_core = sum(sum(MC)) / 2
+    output.edges_periphery = sum(sum(MP)) / 2
+    output.edges_core_periphery = output.edges_network - output.edges_core - output.edges_periphery
+    output.density_core = output.edges_core / ( ( len(MC) * (len(MC)-1) ) / 2 )
+    output.density_periphery = output.edges_periphery / ( ( len(MP) * (len(MP)-1) ) / 2 )
+    output.density_network = output.edges_network / ( ( len(M) * (len(M)-1) ) / 2 )
+    output.average_degree_network = sum(sum(M)) / len(M)
+    output.average_degree_core = (output.edges_core_periphery + output.edges_core) / len(C)
+    output.average_degree_periphery = (output.edges_core_periphery + output.edges_periphery) / len(P)
+    
+    return output
 
