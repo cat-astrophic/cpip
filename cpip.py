@@ -10,7 +10,9 @@ import pandas as pd
 import networkx as nx
 import itertools as it
 
-# Defining the function
+####################################################################################################
+
+# Defining the main function
 
 def cpip(filepath, theta, psi):
     
@@ -187,4 +189,100 @@ def cpip(filepath, theta, psi):
         core = [c.replace('_', ' ') for c in core]
         
         return core
+
+####################################################################################################
+
+# Defining the exploratory function
+
+def cpip_exploratory(filepath, theta):
+    
+    # Safety feature for user error
+    
+    theta = max(theta,1)
+    
+    # Read in the data set
+    
+    W = pd.read_csv(filepath)
+    
+    # Remove all isolated vertices from the data set to be safe
+    
+    isolates = [idx for idx in range(len(W)) if sum(W[W.columns[idx]]) == 0]
+    
+    for iso in [isolates[len(isolates)-1-i] for i in range(len(isolates))]:
+        
+        W = W.drop(W.columns[iso], axis = 1).drop(iso, axis = 0)
+    
+    cols = W.columns
+    W = W.values
+    
+    # Create the vectors c and b
+    
+    c = np.diag(np.matmul(W,np.ones((len(W),len(W)))))
+    b = (len(W)-1)*np.ones(len(W))
+    
+    # Create the matrix A
+    
+    # Create a binary adjacency matrix
+    
+    M = np.zeros((len(W),len(W)))
+    
+    for row in range(len(W)):
+        
+        for col in range(len(W)):
+            
+            if W[row][col] > 0:
+                
+                M[row][col] = 1
+   
+    # Feed this matrix into networkx and create the distance matrix D
+    
+    G = nx.Graph(M)
+    D = np.zeros((len(W),len(W)))
+    
+    for row in range(len(D)):
+        
+        for col in range(len(D)):
+            
+            if (col > row) and D[row][col] == 0:
+                
+                D[row][col] = nx.shortest_path_length(G, row, col)
+    
+    D = D + np.transpose(D)    
+    A = np.diag(np.matmul(D,np.ones(len(W))))
+    
+    # Solve the program
+    
+    problem = pulp.LpProblem('Core-Periphery Network Model', pulp.LpMaximize)
+        
+    # Initialize a list of choice variables
+    
+    x = [pulp.LpVariable(col, lowBound = 0, upBound = 1, cat = 'Integer') for col in cols]
+    
+    # Define the objective function
+    
+    problem += pulp.lpSum([c[i]*x[i] for i in range(len(c))])
+    
+    # Constraints
+    
+    for row in range(len(A)):
+        
+        problem += pulp.lpSum([A[row][i]*x[i] for i in range(len(A))]) <= theta*b[row]
+        
+    # Solve this problem
+    
+    problem.solve()
+    
+    # Create the truncated data
+    
+    # Create a reference list of nations which were in the solution to part 1
+    
+    subset = []
+    
+    for var in problem.variables():
+        
+        if var.varValue > 0:
+            
+            subset.append(str(var).replace('_', ' '))
+        
+    return subset
 
