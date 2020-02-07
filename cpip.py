@@ -299,7 +299,7 @@ class network_object():
 
 # Visualization function
 
-def cpip_viz(filepath, core):
+def cpip_viz(filepath, core, core_labels):
     
     # Read in the network data for the full network
     
@@ -326,15 +326,27 @@ def cpip_viz(filepath, core):
     core_graph = nx.Graph(C.values)
     peri_graph = nx.Graph(P.values)
     
-    print('THE ENTIRE NETWORK')
     plt.figure()
     nx.draw_circular(net_graph)
+
+    if core_labels == True:
+        
+        core_pos = nx.circular_layout(core_graph)
+        
+        for c, p in core_pos.items(): # Labels for the core
+            
+            core_pos[c] = (p[0], p[1]+.25*((-1)**(round(c / len(core)))))
     
-    print('THE CORE OF THE NETWORK')
-    plt.figure()
-    nx.draw_circular(core_graph, labels = dict(zip([i for i in range(len(core))],core)))
+        plt.figure()
+        nx.draw_circular(core_graph)
+        nx.draw_networkx_labels(core_graph, core_pos, dict(zip([i for i in range(len(core))],core)))
+        plt.margins(.25)
+        
+    else:
+        
+        plt.figure()
+        nx.draw_circular(core_graph)
     
-    print('THE PERIPHERY OF THE NETWORK')
     plt.figure()
     nx.draw_circular(peri_graph)
     
@@ -368,7 +380,7 @@ def cpip_viz(filepath, core):
                 
                 MP[row][col] = 1
                             
-    # Creating the output
+    # Creating the output object
     
     output = network_object()
     output.network = network_object()
