@@ -1,4 +1,8 @@
-# This function identifies the core of a network in a core-periphery analysis with integer programming via pulp
+# cpip identifies the core of a network in a core-periphery analysis with integer programming via pulp
+
+# cpip_exploratory provides an exploratory analysis (first step in the algorithm) to help with determining parameters
+
+# cpip_viz creates some visualizations of the cpip results and also outputs some relevant network statistics
 
 # The input must be a weighted adjacency matrix for a network, hence the input need not be symmetric (e.g., directed networks)
 
