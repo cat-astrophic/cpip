@@ -299,11 +299,17 @@ class network_object():
 
 # Visualization function
 
-def cpip_viz(filepath, core, core_labels):
+def cpip_viz(filepath, core, *core_labels): # Note that core must be a list even if the core is empty or contains only one member
     
     # Read in the network data for the full network
     
     W = pd.read_csv(filepath)
+    
+    # Handling core_labels
+    
+    if len(core_labels) < 1:
+        
+        core_labels = True
     
     # Create the core and periphery of the network
     
@@ -332,15 +338,33 @@ def cpip_viz(filepath, core, core_labels):
     if core_labels == True:
         
         core_pos = nx.circular_layout(core_graph)
-        
+
         for c, p in core_pos.items(): # Labels for the core
             
             core_pos[c] = (p[0], p[1]+.25*((-1)**(round(c / len(core)))))
-    
-        plt.figure()
-        nx.draw_circular(core_graph)
-        nx.draw_networkx_labels(core_graph, core_pos, dict(zip([i for i in range(len(core))],core)))
-        plt.margins(.25)
+        
+        if len(core) > 2:
+        
+            plt.figure()
+            nx.draw_circular(core_graph)
+            nx.draw_networkx_labels(core_graph, core_pos, dict(zip([i for i in range(len(core))],core)))
+            plt.margins(.25)
+            
+        else: # Handling a weird networkx bug where it won't dispaly labels for graphs with a core containing less than 3 members
+            
+            plt.figure()
+            nx.draw_circular(core_graph)
+            
+            if len(core) < 2:
+                
+                plt.text(0, .01, core[0], horizontalalignment = 'center')
+            
+            else:
+                
+                plt.text(1, .01, core[0], horizontalalignment = 'center')
+                plt.text(-1, .01, core[1], horizontalalignment = 'center')
+
+            plt.margins(.25)
         
     else:
         
