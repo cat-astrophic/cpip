@@ -289,7 +289,7 @@ def cpip_exploratory(filepath, theta):
 
 ####################################################################################################
 
-# Creating a class for the cpip_viz and cpip_stats functions
+# Creating a class used in the cpip_viz function
 
 class network_object():
     
@@ -299,17 +299,13 @@ class network_object():
 
 # Visualization function
 
-def cpip_viz(filepath, core, *core_labels): # Note that core must be a list even if the core is empty or contains only one member
+# Note that core must be a list even if the core is empty or contains only one member
+
+def cpip_viz(filepath, core, core_labels = None, savefigs = None, newpath = None):
     
     # Read in the network data for the full network
     
     W = pd.read_csv(filepath)
-    
-    # Handling core_labels
-    
-    if len(core_labels) < 1:
-        
-        core_labels = True
     
     # Create the core and periphery of the network
     
@@ -334,6 +330,16 @@ def cpip_viz(filepath, core, *core_labels): # Note that core must be a list even
     
     plt.figure()
     nx.draw_circular(net_graph)
+    
+    if savefigs != None:
+        
+        if newpath != None:
+            
+            plt.savefig(newpath)
+
+        else:
+            
+            plt.savefig(filepath[0:len(filepath)-4] + '_network.' + savefigs)
 
     if core_labels == True:
         
@@ -366,31 +372,45 @@ def cpip_viz(filepath, core, *core_labels): # Note that core must be a list even
 
             plt.margins(.25)
         
+        if savefigs != None:
+            
+            if newpath != None:
+                
+                plt.savefig(newpath)
+                
+            else:
+                
+                plt.savefig(filepath[0:len(filepath)-4] + '_core.' + savefigs)
+        
     else:
         
         plt.figure()
         nx.draw_circular(core_graph)
+        
+        if savefigs != None:
+            
+            if newpath != None:
+                
+                plt.savefig(newpath)
+                
+            else:
+                
+                plt.savefig(filepath[0:len(filepath)-4] + '_core.' + savefigs)
     
     plt.figure()
     nx.draw_circular(peri_graph)
-                            
-    # Creating the output object
     
-    output = network_object()
-    output.network = network_object()
-    output.network.data = W
-    output.network.viz = net_graph
-    output.core = network_object()
-    output.core.data = C
-    output.core.viz = core_graph
-    output.periphery = network_object()
-    output.periphery.data = P
-    output.periphery.viz = peri_graph
-    
-    return output
+    if savefigs != None:
+        
+        if newpath != None:
+                
+            plt.savefig(newpath)
+                
+        else:
+                
+            plt.savefig(filepath[0:len(filepath)-4] + '_core.' + savefigs)
 
 ####################################################################################################
-
 
 # Function to generate some relevant statistics on the network and its core and periphery
 
@@ -458,6 +478,6 @@ def cpip_stats(filepath, core):
     output.average_degree_network = sum(sum(M)) / len(M)
     output.average_degree_core = (output.edges_core_periphery + output.edges_core) / len(C)
     output.average_degree_periphery = (output.edges_core_periphery + output.edges_periphery) / len(P)
-        
+    
     return output
 
