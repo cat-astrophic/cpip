@@ -304,7 +304,7 @@ class network_object():
 def cpip_viz(filepath, core, core_labels = None, savefigs = None, newpath = None):
     
     # Read in the network data for the full network
-    
+    print(savefigs)
     W = pd.read_csv(filepath)
     
     # Create the core and periphery of the network
@@ -335,7 +335,7 @@ def cpip_viz(filepath, core, core_labels = None, savefigs = None, newpath = None
         
         if newpath != None:
             
-            plt.savefig(newpath)
+            plt.savefig(newpath + '_network.' + savefigs)
 
         else:
             
@@ -376,7 +376,7 @@ def cpip_viz(filepath, core, core_labels = None, savefigs = None, newpath = None
             
             if newpath != None:
                 
-                plt.savefig(newpath)
+                plt.savefig(newpath + '_core.' + savefigs)
                 
             else:
                 
@@ -391,7 +391,7 @@ def cpip_viz(filepath, core, core_labels = None, savefigs = None, newpath = None
             
             if newpath != None:
                 
-                plt.savefig(newpath)
+                plt.savefig(newpath + '_core.' + savefigs)
                 
             else:
                 
@@ -404,11 +404,11 @@ def cpip_viz(filepath, core, core_labels = None, savefigs = None, newpath = None
         
         if newpath != None:
                 
-            plt.savefig(newpath)
+            plt.savefig(newpath + '_periphery.' + savefigs)
                 
         else:
                 
-            plt.savefig(filepath[0:len(filepath)-4] + '_core.' + savefigs)
+            plt.savefig(filepath[0:len(filepath)-4] + '_periphery.' + savefigs)
 
 ####################################################################################################
 
