@@ -1,8 +1,4 @@
-# cpip identifies the core of a network in a core-periphery analysis with integer programming via pulp
-
-# cpip_exploratory provides an exploratory analysis (first step in the algorithm) to help with determining parameters
-
-# cpip_viz creates some visualizations of the cpip results and also outputs some relevant network statistics
+# This function identifies the core of a network in a core-periphery analysis with integer programming via pulp
 
 # The input must be a weighted adjacency matrix for a network, hence the input need not be symmetric (e.g., directed networks)
 
@@ -293,7 +289,7 @@ def cpip_exploratory(filepath, theta):
 
 ####################################################################################################
 
-# Creating a class for the cpip_viz function
+# Creating a class for the cpip_viz and cpip_stats functions
 
 class network_object():
     
@@ -353,6 +349,47 @@ def cpip_viz(filepath, core, core_labels):
     
     plt.figure()
     nx.draw_circular(peri_graph)
+                            
+    # Creating the output object
+    
+    output = network_object()
+    output.network = network_object()
+    output.network.data = W
+    output.network.viz = net_graph
+    output.core = network_object()
+    output.core.data = C
+    output.core.viz = core_graph
+    output.periphery = network_object()
+    output.periphery.data = P
+    output.periphery.viz = peri_graph
+    
+    return output
+
+####################################################################################################
+
+
+# Function to generate some relevant statistics on the network and its core and periphery
+
+def cpip_stats(filepath, core):
+    
+    # Read in the network data for the full network
+    
+    W = pd.read_csv(filepath)
+    
+    # Create the core and periphery of the network
+    
+    c_ids = [list(W.columns).index(c) for c in core]
+    p_ids = [i for i in range(len(W.columns)) if W.columns[i] not in core]
+    C = W
+    P = W
+    
+    for c in [c_ids[len(c_ids)-1-i] for i in range(len(c_ids))]:
+        
+        P = P.drop(P.columns[c], axis = 1).drop(c, axis = 0)
+    
+    for p in [p_ids[len(p_ids)-1-i] for i in range(len(p_ids))]:
+        
+        C = C.drop(C.columns[p], axis = 1).drop(p, axis = 0)
     
     # Preparing some arrays of binary adjacency matrices for generating function outputs
     
@@ -383,19 +420,8 @@ def cpip_viz(filepath, core, core_labels):
             if P.values[row][col] > 0:
                 
                 MP[row][col] = 1
-                            
-    # Creating the output object
     
     output = network_object()
-    output.network = network_object()
-    output.network.data = W
-    output.network.viz = net_graph
-    output.core = network_object()
-    output.core.data = C
-    output.core.viz = core_graph
-    output.periphery = network_object()
-    output.periphery.data = P
-    output.periphery.viz = peri_graph
     output.core_size = len(c_ids)
     output.core_ratio = len(c_ids) / (len(c_ids) + len(p_ids))
     output.edges_network = sum(sum(M)) / 2
@@ -408,6 +434,6 @@ def cpip_viz(filepath, core, core_labels):
     output.average_degree_network = sum(sum(M)) / len(M)
     output.average_degree_core = (output.edges_core_periphery + output.edges_core) / len(C)
     output.average_degree_periphery = (output.edges_core_periphery + output.edges_periphery) / len(P)
-    
+        
     return output
 
