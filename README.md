@@ -12,7 +12,7 @@
     * **pandas** for data manipulation
     * **numpy** for data manipulation
 
-
+Next up is to add functions which solve this problem in the digraph setting
 
 <!-- solves an initial linear program (display below) -->
 
