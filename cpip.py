@@ -301,11 +301,16 @@ class network_object():
 
 # Visualization function
 
-# Note that core must be a list even if the core is empty or contains only one member
-
 def cpip_viz(filepath, core, core_labels = None, savefigs = None, newpath = None):
     
+    # Ensure that core is a list and not a string
+    
+    if len(core) == 1:
+        
+        core = list(core)
+    
     # Read in the network data for the full network
+    
     print(savefigs)
     W = pd.read_csv(filepath)
     
@@ -876,4 +881,26 @@ def cpip_summary_tex(output):
             
     print('\end{tabular}')
     print('\end{table}')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
