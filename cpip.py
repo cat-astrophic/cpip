@@ -1,8 +1,6 @@
 # This function identifies the core of a network in a core-periphery analysis with integer programming via pulp
 
-# The input must be a (weighted) adjacency matrix for a network
-
-# As of now this only works for symmetric (weighted) adjacency matrices; i.e., relations must be bidirectional in some sense
+# The input must be a (weighted) adjacency matrix for a network (directed or undirected)
 
 # Import required modules
     
@@ -881,26 +879,4 @@ def cpip_summary_tex(output):
             
     print('\end{tabular}')
     print('\end{table}')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
