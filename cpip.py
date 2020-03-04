@@ -15,7 +15,7 @@ from matplotlib import pyplot as plt
 
 # Defining the main function
 
-def cpip(filepath, theta, psi, remove = None):
+def cpip(filepath, theta, psi, loops = None):
     
     # Safety feature for user error
     
@@ -26,9 +26,9 @@ def cpip(filepath, theta, psi, remove = None):
     
     W = pd.read_csv(filepath)
     
-    # Remove loops (self interactions) if remove == True
+    # Remove loops (self interactions) if loops != True
     
-    if remove == True:
+    if loops != True:
         
         for i in range(len(W)):
             
@@ -203,7 +203,7 @@ def cpip(filepath, theta, psi, remove = None):
 
 # Defining the exploratory function
 
-def cpip_exploratory(filepath, theta, remove = None):
+def cpip_exploratory(filepath, theta, loops = None):
     
     # Safety feature for user error
     
@@ -213,9 +213,9 @@ def cpip_exploratory(filepath, theta, remove = None):
     
     W = pd.read_csv(filepath)
 
-    # Remove loops (self interactions) if remove == True
+    # Remove loops (self interactions) if loops != True
     
-    if remove == True:
+    if loops != True:
         
         for i in range(len(W)):
             
