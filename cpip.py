@@ -15,7 +15,7 @@ from matplotlib import pyplot as plt
 
 # Defining the main function
 
-def cpip(filepath, theta, psi):
+def cpip(filepath, theta, psi, remove = None):
     
     # Safety feature for user error
     
@@ -25,6 +25,14 @@ def cpip(filepath, theta, psi):
     # Read in the data set
     
     W = pd.read_csv(filepath)
+    
+    # Remove loops (self interactions) if remove == True
+    
+    if remove == True:
+        
+        for i in range(len(W)):
+            
+            W[W.columns[i]][i] = 0
     
     # Remove all isolated vertices from the data set to be safe
     
@@ -70,7 +78,7 @@ def cpip(filepath, theta, psi):
                 
                 D[row][col] = nx.shortest_path_length(G, row, col)
     
-    D = D + np.transpose(D)    
+    D = D + np.transpose(D)
     A = np.diag(np.matmul(D,np.ones(len(W))))
     
     # Solve the program
@@ -195,7 +203,7 @@ def cpip(filepath, theta, psi):
 
 # Defining the exploratory function
 
-def cpip_exploratory(filepath, theta):
+def cpip_exploratory(filepath, theta, remove = None):
     
     # Safety feature for user error
     
@@ -204,6 +212,14 @@ def cpip_exploratory(filepath, theta):
     # Read in the data set
     
     W = pd.read_csv(filepath)
+
+    # Remove loops (self interactions) if remove == True
+    
+    if remove == True:
+        
+        for i in range(len(W)):
+            
+            W[W.columns[i]][i] = 0
     
     # Remove all isolated vertices from the data set to be safe
     
