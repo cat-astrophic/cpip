@@ -11,6 +11,26 @@ import networkx as nx
 import itertools as it
 from matplotlib import pyplot as plt
 
+""" Can I add a weight threshold for centrality that is a user input? """
+
+####################################################################################################
+
+# Creating a helper function for reformatting column names to meet pulp specifications
+
+def pulp_names(string):
+    
+    string_list = list(string)
+    
+    for s in range(len(string_list)):
+        
+        if string_list[s].isalnum() == False:
+            
+            string_list[s] = '_'
+    
+    new_string = ''.join(string_list)
+    
+    return new_string
+
 ####################################################################################################
 
 # Defining the main function
@@ -25,6 +45,16 @@ def cpip(filepath, theta, psi, loops = None):
     # Read in the data set
     
     W = pd.read_csv(filepath)
+    
+    # Rename columns to match pulp formatting
+    
+    cc = list(W.columns)
+    
+    for c in range(len(cc)):
+        
+        cc[c] = pulp_names(cc[c])
+        
+    W.columns = cc
     
     # Remove loops (self interactions) if loops != True
     
@@ -113,7 +143,7 @@ def cpip(filepath, theta, psi, loops = None):
         
         if var.varValue > 0:
             
-            subset.append(str(var).replace('_', ' '))
+            subset.append(str(var))
         
     # Continue this process if the first stage optimization problem yields at least two potential members of the core
 
@@ -192,10 +222,6 @@ def cpip(filepath, theta, psi, loops = None):
                     if pulp.value(prob.objective) > val:
                         
                         val, core = pulp.value(prob.objective), [str(v) for v in prob.variables() if v.varValue > 0]
-                        
-        # Update names elements in core to match original format and return core
-        
-        core = [c.replace('_', ' ') for c in core]
         
         return core
 
@@ -212,7 +238,17 @@ def cpip_exploratory(filepath, theta, loops = None):
     # Read in the data set
     
     W = pd.read_csv(filepath)
-
+    
+    # Rename columns to match pulp formatting
+    
+    cc = list(W.columns)
+    
+    for c in range(len(cc)):
+        
+        cc[c] = pulp_names(cc[c])
+        
+    W.columns = cc    
+    
     # Remove loops (self interactions) if loops != True
     
     if loops != True:
@@ -270,7 +306,7 @@ def cpip_exploratory(filepath, theta, loops = None):
     # Solve the program
     
     problem = pulp.LpProblem('Core-Periphery Network Model', pulp.LpMaximize)
-        
+    
     # Initialize a list of choice variables
     
     x = [pulp.LpVariable(col, lowBound = 0, upBound = 1, cat = 'Integer') for col in cols]
@@ -299,7 +335,7 @@ def cpip_exploratory(filepath, theta, loops = None):
         
         if var.varValue > 0:
             
-            subset.append(str(var).replace('_', ' '))
+            subset.append(str(var))
         
     return subset
 
@@ -325,8 +361,17 @@ def cpip_viz(filepath, core, core_labels = None, savefigs = None, newpath = None
     
     # Read in the network data for the full network
     
-    print(savefigs)
     W = pd.read_csv(filepath)
+    
+    # Rename columns to match pulp formatting
+    
+    cc = list(W.columns)
+    
+    for c in range(len(cc)):
+        
+        cc[c] = pulp_names(cc[c])
+        
+    W.columns = cc
     
     # Create the core and periphery of the network
     
@@ -440,6 +485,16 @@ def cpip_stats(filepath, core):
     # Read in the network data for the full network
     
     W = pd.read_csv(filepath)
+    
+    # Rename columns to match pulp formatting
+    
+    cc = list(W.columns)
+    
+    for c in range(len(cc)):
+        
+        cc[c] = pulp_names(cc[c])
+        
+    W.columns = cc
     
     # Create the core and periphery of the network
     
