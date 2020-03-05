@@ -207,7 +207,7 @@ def cpip(filepath, theta, psi, loops = None):
                 
                 for row in range(len(Axa)):
                 
-                    prob += pulp.lpSum([Axa[row][i]*y[i] for i in range(len(Axa))]) <= a*psi*bxa[row]
+                    prob += pulp.lpSum([Axa[row][i]*y[i] for i in range(len(Axa))]) <= (a-1)*psi*bxa[row]
                 
                 # Solve the problem
                 
@@ -216,9 +216,9 @@ def cpip(filepath, theta, psi, loops = None):
                 # Check to see if this is the new optimum
                 
                 if str(type(pulp.value(prob.objective))) != "<class 'NoneType'>":
-                    
-                    if pulp.value(prob.objective) > val:
-                        
+
+                    if pulp.value(prob.objective) > val and len([str(v) for v in prob.variables() if v.varValue > 0]) == a:
+
                         val, core = pulp.value(prob.objective), [str(v) for v in prob.variables() if v.varValue > 0]
         
         return core
