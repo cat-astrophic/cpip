@@ -11,8 +11,6 @@ import networkx as nx
 import itertools as it
 from matplotlib import pyplot as plt
 
-""" Can I add a weight threshold for centrality that is a user input? """
-
 ####################################################################################################
 
 # Creating a helper function for reformatting column names to meet pulp specifications
