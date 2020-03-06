@@ -1,6 +1,6 @@
 ## Examples
 
-* This folder contains the code used to provide several examples of cpip in action.
+This folder contains the code used to provide several examples of cpip in action.
 
 * There are csv files (a, b, and c) which contain adjacency matrices for artificially constructed examples.
 
