@@ -4,18 +4,18 @@
 
 # Import required modules
     
-import pulp
-import numpy as np
-import pandas as pd
-import networkx as nx
-import itertools as it
-from matplotlib import pyplot as plt
+import pulp as __pulp__
+import numpy as __np__
+import pandas as __pd__
+import networkx as __nx__
+import itertools as __it__
+from matplotlib import pyplot as __plt__
 
 ####################################################################################################
 
 # Creating a helper function for reformatting column names to meet pulp specifications
 
-def pulp_names(string):
+def __pulp_names__(string):
     
     string_list = list(string)
     
@@ -42,7 +42,7 @@ def cpip(filepath, theta, psi, loops = None):
     
     # Read in the data set
     
-    W = pd.read_csv(filepath)
+    W = __pd__.read_csv(filepath)
     
     # Rename columns to match pulp formatting
     
@@ -50,7 +50,7 @@ def cpip(filepath, theta, psi, loops = None):
     
     for c in range(len(cc)):
         
-        cc[c] = pulp_names(cc[c])
+        cc[c] = __pulp_names__(cc[c])
         
     W.columns = cc
     
@@ -70,20 +70,20 @@ def cpip(filepath, theta, psi, loops = None):
         
         W = W.drop(W.columns[iso], axis = 1).drop(iso, axis = 0)
     
-    W2 = W.set_index(pd.Index([i for i in range(len(W))]))
+    W2 = W.set_index(__pd__.Index([i for i in range(len(W))]))
     cols = W.columns
     W = W.values
     
     # Create the vectors c and b
     
-    c = np.diag(np.matmul(W,np.ones((len(W),len(W)))))
-    b = (len(W)-1)*np.ones(len(W))
+    c = __np__.diag(__np__.matmul(W,__np__.ones((len(W),len(W)))))
+    b = (len(W)-1)*__np__.ones(len(W))
     
     # Create the matrix A
     
     # Create a binary adjacency matrix
     
-    M = np.zeros((len(W),len(W)))
+    M = __np__.zeros((len(W),len(W)))
     
     for row in range(len(W)):
         
@@ -95,8 +95,8 @@ def cpip(filepath, theta, psi, loops = None):
    
     # Feed this matrix into networkx and create the distance matrix D
     
-    G = nx.Graph(M)
-    D = np.zeros((len(W),len(W)))
+    G = __nx__.Graph(M)
+    D = __np__.zeros((len(W),len(W)))
     
     for row in range(len(D)):
         
@@ -104,28 +104,28 @@ def cpip(filepath, theta, psi, loops = None):
             
             if (col > row) and D[row][col] == 0:
                 
-                D[row][col] = nx.shortest_path_length(G, row, col)
+                D[row][col] = __nx__.shortest_path_length(G, row, col)
     
-    D = D + np.transpose(D)
-    A = np.diag(np.matmul(D,np.ones(len(W))))
+    D = D + __np__.transpose(D)
+    A = __np__.diag(__np__.matmul(D,__np__.ones(len(W))))
     
     # Solve the program
     
-    problem = pulp.LpProblem('Core-Periphery Network Model', pulp.LpMaximize)
+    problem = __pulp__.LpProblem('Core-Periphery Network Model', __pulp__.LpMaximize)
         
     # Initialize a list of choice variables
     
-    x = [pulp.LpVariable(col, lowBound = 0, upBound = 1, cat = 'Integer') for col in cols]
+    x = [__pulp__.LpVariable(col, lowBound = 0, upBound = 1, cat = 'Integer') for col in cols]
     
     # Define the objective function
     
-    problem += pulp.lpSum([c[i]*x[i] for i in range(len(c))])
+    problem += __pulp__.lpSum([c[i]*x[i] for i in range(len(c))])
     
     # Constraints
     
     for row in range(len(A)):
         
-        problem += pulp.lpSum([A[row][i]*x[i] for i in range(len(A))]) <= theta*b[row]
+        problem += __pulp__.lpSum([A[row][i]*x[i] for i in range(len(A))]) <= theta*b[row]
         
     # Solve this problem
     
@@ -155,7 +155,7 @@ def cpip(filepath, theta, psi, loops = None):
         
         idxset = [list(W2.columns).index(sub) for sub in subset] # indices of core candidate vertices
         dropset = [b for b in range(len(W2.columns)) if b not in idxset] # remaining indices
-        Dx = pd.DataFrame(D, columns = W2.columns)
+        Dx = __pd__.DataFrame(D, columns = W2.columns)
         
         for idx in [dropset[len(dropset)-1-i] for i in range(len(dropset))]:
 
@@ -170,7 +170,7 @@ def cpip(filepath, theta, psi, loops = None):
             
             # Generate all a-tuples
             
-            tuples = list(it.combinations(idxset, a))
+            tuples = list(__it__.combinations(idxset, a))
             
             # Check all combinations
             
@@ -189,25 +189,25 @@ def cpip(filepath, theta, psi, loops = None):
                     cxa.pop(ids)
                 
                 Axa = Dxa.values                
-                bxa = np.ones(len(Axa))
+                bxa = __np__.ones(len(Axa))
                 
                 # Define the problem
                 
-                prob = pulp.LpProblem('Core-Periphery Network Model', pulp.LpMaximize)
+                prob = __pulp__.LpProblem('Core-Periphery Network Model', __pulp__.LpMaximize)
                 
                 # Initialize a list of choice variables
                 
-                y = [pulp.LpVariable(col, lowBound = 0, upBound = 1, cat = 'Integer') for col in Dxa.columns]
+                y = [__pulp__.LpVariable(col, lowBound = 0, upBound = 1, cat = 'Integer') for col in Dxa.columns]
                 
                 # Define the objective function
                 
-                prob += pulp.lpSum([cxa[i]*y[i] for i in range(len(Dxa))])
+                prob += __pulp__.lpSum([cxa[i]*y[i] for i in range(len(Dxa))])
                 
                 # Constraints
                 
                 for row in range(len(Axa)):
                 
-                    prob += pulp.lpSum([Axa[row][i]*y[i] for i in range(len(Axa))]) <= (a-1)*psi*bxa[row]
+                    prob += __pulp__.lpSum([Axa[row][i]*y[i] for i in range(len(Axa))]) <= (a-1)*psi*bxa[row]
                 
                 # Solve the problem
                 
@@ -215,11 +215,11 @@ def cpip(filepath, theta, psi, loops = None):
                 
                 # Check to see if this is the new optimum
                 
-                if str(type(pulp.value(prob.objective))) != "<class 'NoneType'>":
+                if str(type(__pulp__.value(prob.objective))) != "<class 'NoneType'>":
 
-                    if pulp.value(prob.objective) > val and len([str(v) for v in prob.variables() if v.varValue > 0]) == a:
+                    if __pulp__.value(prob.objective) > val and len([str(v) for v in prob.variables() if v.varValue > 0]) == a:
 
-                        val, core = pulp.value(prob.objective), [str(v) for v in prob.variables() if v.varValue > 0]
+                        val, core = __pulp__.value(prob.objective), [str(v) for v in prob.variables() if v.varValue > 0]
         
         return core
 
@@ -235,7 +235,7 @@ def cpip_exploratory(filepath, theta, loops = None):
     
     # Read in the data set
     
-    W = pd.read_csv(filepath)
+    W = __pd__.read_csv(filepath)
     
     # Rename columns to match pulp formatting
     
@@ -243,7 +243,7 @@ def cpip_exploratory(filepath, theta, loops = None):
     
     for c in range(len(cc)):
         
-        cc[c] = pulp_names(cc[c])
+        cc[c] = __pulp_names__(cc[c])
         
     W.columns = cc    
     
@@ -268,14 +268,14 @@ def cpip_exploratory(filepath, theta, loops = None):
     
     # Create the vectors c and b
     
-    c = np.diag(np.matmul(W,np.ones((len(W),len(W)))))
-    b = (len(W)-1)*np.ones(len(W))
+    c = __np__.diag(__np__.matmul(W,__np__.ones((len(W),len(W)))))
+    b = (len(W)-1)*__np__.ones(len(W))
     
     # Create the matrix A
     
     # Create a binary adjacency matrix
     
-    M = np.zeros((len(W),len(W)))
+    M = __np__.zeros((len(W),len(W)))
     
     for row in range(len(W)):
         
@@ -287,8 +287,8 @@ def cpip_exploratory(filepath, theta, loops = None):
    
     # Feed this matrix into networkx and create the distance matrix D
     
-    G = nx.Graph(M)
-    D = np.zeros((len(W),len(W)))
+    G = __nx__.Graph(M)
+    D = __np__.zeros((len(W),len(W)))
     
     for row in range(len(D)):
         
@@ -296,28 +296,28 @@ def cpip_exploratory(filepath, theta, loops = None):
             
             if (col > row) and D[row][col] == 0:
                 
-                D[row][col] = nx.shortest_path_length(G, row, col)
+                D[row][col] = __nx__.shortest_path_length(G, row, col)
     
-    D = D + np.transpose(D)    
-    A = np.diag(np.matmul(D,np.ones(len(W))))
+    D = D + __np__.transpose(D)    
+    A = __np__.diag(__np__.matmul(D,__np__.ones(len(W))))
     
     # Solve the program
     
-    problem = pulp.LpProblem('Core-Periphery Network Model', pulp.LpMaximize)
+    problem = __pulp__.LpProblem('Core-Periphery Network Model', __pulp__.LpMaximize)
     
     # Initialize a list of choice variables
     
-    x = [pulp.LpVariable(col, lowBound = 0, upBound = 1, cat = 'Integer') for col in cols]
+    x = [__pulp__.LpVariable(col, lowBound = 0, upBound = 1, cat = 'Integer') for col in cols]
     
     # Define the objective function
     
-    problem += pulp.lpSum([c[i]*x[i] for i in range(len(c))])
+    problem += __pulp__.lpSum([c[i]*x[i] for i in range(len(c))])
     
     # Constraints
     
     for row in range(len(A)):
         
-        problem += pulp.lpSum([A[row][i]*x[i] for i in range(len(A))]) <= theta*b[row]
+        problem += __pulp__.lpSum([A[row][i]*x[i] for i in range(len(A))]) <= theta*b[row]
         
     # Solve this problem
     
@@ -341,7 +341,7 @@ def cpip_exploratory(filepath, theta, loops = None):
 
 # Creating a class used in the cpip_viz function
 
-class network_object():
+class __network_object__():
     
     pass
 
@@ -359,7 +359,7 @@ def cpip_viz(filepath, core, core_labels = None, savefigs = None, newpath = None
     
     # Read in the network data for the full network
     
-    W = pd.read_csv(filepath)
+    W = __pd__.read_csv(filepath)
     
     # Rename columns to match pulp formatting
     
@@ -367,7 +367,7 @@ def cpip_viz(filepath, core, core_labels = None, savefigs = None, newpath = None
     
     for c in range(len(cc)):
         
-        cc[c] = pulp_names(cc[c])
+        cc[c] = __pulp_names__(cc[c])
         
     W.columns = cc
     
@@ -388,26 +388,26 @@ def cpip_viz(filepath, core, core_labels = None, savefigs = None, newpath = None
     
     # Create and display the network, its core, and the periphery
     
-    net_graph = nx.Graph(W.values)
-    core_graph = nx.Graph(C.values)
-    peri_graph = nx.Graph(P.values)
+    net_graph = __nx__.Graph(W.values)
+    core_graph = __nx__.Graph(C.values)
+    peri_graph = __nx__.Graph(P.values)
     
-    plt.figure()
-    nx.draw_circular(net_graph)
+    __plt__.figure()
+    __nx__.draw_circular(net_graph)
     
     if savefigs != None:
         
         if newpath != None:
             
-            plt.savefig(newpath + '_network.' + savefigs)
+            __plt__.savefig(newpath + '_network.' + savefigs)
 
         else:
             
-            plt.savefig(filepath[0:len(filepath)-4] + '_network.' + savefigs)
+            __plt__.savefig(filepath[0:len(filepath)-4] + '_network.' + savefigs)
 
     if core_labels == True:
         
-        core_pos = nx.circular_layout(core_graph)
+        core_pos = __nx__.circular_layout(core_graph)
 
         for c, p in core_pos.items(): # Labels for the core
             
@@ -415,64 +415,64 @@ def cpip_viz(filepath, core, core_labels = None, savefigs = None, newpath = None
         
         if len(core) > 2:
         
-            plt.figure()
-            nx.draw_circular(core_graph)
-            nx.draw_networkx_labels(core_graph, core_pos, dict(zip([i for i in range(len(core))],core)))
-            plt.margins(.25)
+            __plt__.figure()
+            __nx__.draw_circular(core_graph)
+            __nx__.draw_networkx_labels(core_graph, core_pos, dict(zip([i for i in range(len(core))],core)))
+            __plt__.margins(.25)
             
         else: # Handling a weird networkx bug where it won't dispaly labels for graphs with a core containing less than 3 members
             
-            plt.figure()
-            nx.draw_circular(core_graph)
+            __plt__.figure()
+            __nx__.draw_circular(core_graph)
             
             if len(core) < 2:
                 
-                plt.text(0, .01, core[0], horizontalalignment = 'center')
+                __plt__.text(0, .01, core[0], horizontalalignment = 'center')
             
             else:
                 
-                plt.text(1, .01, core[0], horizontalalignment = 'center')
-                plt.text(-1, .01, core[1], horizontalalignment = 'center')
+                __plt__.text(1, .01, core[0], horizontalalignment = 'center')
+                __plt__.text(-1, .01, core[1], horizontalalignment = 'center')
 
-            plt.margins(.25)
+            __plt__.margins(.25)
         
         if savefigs != None:
             
             if newpath != None:
                 
-                plt.savefig(newpath + '_core.' + savefigs)
+                __plt__.savefig(newpath + '_core.' + savefigs)
                 
             else:
                 
-                plt.savefig(filepath[0:len(filepath)-4] + '_core.' + savefigs)
+                __plt__.savefig(filepath[0:len(filepath)-4] + '_core.' + savefigs)
         
     else:
         
-        plt.figure()
-        nx.draw_circular(core_graph)
+        __plt__.figure()
+        __nx__.draw_circular(core_graph)
         
         if savefigs != None:
             
             if newpath != None:
                 
-                plt.savefig(newpath + '_core.' + savefigs)
+                __plt__.savefig(newpath + '_core.' + savefigs)
                 
             else:
                 
-                plt.savefig(filepath[0:len(filepath)-4] + '_core.' + savefigs)
+                __plt__.savefig(filepath[0:len(filepath)-4] + '_core.' + savefigs)
     
-    plt.figure()
-    nx.draw_circular(peri_graph)
+    __plt__.figure()
+    __nx__.draw_circular(peri_graph)
     
     if savefigs != None:
         
         if newpath != None:
                 
-            plt.savefig(newpath + '_periphery.' + savefigs)
+            __plt__.savefig(newpath + '_periphery.' + savefigs)
                 
         else:
                 
-            plt.savefig(filepath[0:len(filepath)-4] + '_periphery.' + savefigs)
+            __plt__.savefig(filepath[0:len(filepath)-4] + '_periphery.' + savefigs)
 
 ####################################################################################################
 
@@ -482,7 +482,7 @@ def cpip_stats(filepath, core):
     
     # Read in the network data for the full network
     
-    W = pd.read_csv(filepath)
+    W = __pd__.read_csv(filepath)
     
     # Rename columns to match pulp formatting
     
@@ -490,7 +490,7 @@ def cpip_stats(filepath, core):
     
     for c in range(len(cc)):
         
-        cc[c] = pulp_names(cc[c])
+        cc[c] = __pulp_names__(cc[c])
         
     W.columns = cc
     
@@ -541,18 +541,18 @@ def cpip_stats(filepath, core):
     
     # Creating the output object
     
-    output = network_object()
+    output = __network_object__()
     
     # Number of vertices
     
-    output.order = network_object()
+    output.order = __network_object__()
     output.order.network = len(M)
     output.order.core = len(c_ids)
     output.order.periphery = len(p_ids)
     
     # Number of edges
     
-    output.size = network_object()
+    output.size = __network_object__()
     output.size.network = sum(sum(M)) / 2
     output.size.core = sum(sum(MC)) / 2
     output.size.periphery = sum(sum(MP)) / 2
@@ -560,12 +560,12 @@ def cpip_stats(filepath, core):
     
     # Ratios of order and size
     
-    output.ratio_v = network_object()
+    output.ratio_v = __network_object__()
     output.ratio_v.network = 1
     output.ratio_v.core = output.order.core / output.order.network
     output.ratio_v.periphery = 1 - output.ratio_v.core
     
-    output.ratio_e = network_object()
+    output.ratio_e = __network_object__()
     output.ratio_e.network = 1
     output.ratio_e.core = output.size.core / output.size.network
     output.ratio_e.periphery = output.size.periphery / output.size.network
@@ -573,57 +573,57 @@ def cpip_stats(filepath, core):
     
     # Densities
     
-    output.density = network_object()
+    output.density = __network_object__()
     output.density.network = output.size.network / ( ( len(M) * (len(M)-1) ) / 2 )
     output.density.core = output.size.core / ( ( len(MC) * (len(MC)-1) ) / 2 )
     output.density.periphery = output.size.periphery / ( ( len(MP) * (len(MP)-1) ) / 2 )
     
     # Degree statistics (mean, min, max)
     
-    output.within_degrees = network_object()
-    output.total_degrees = network_object()
+    output.within_degrees = __network_object__()
+    output.total_degrees = __network_object__()
     
-    output.within_degrees.average = network_object()
+    output.within_degrees.average = __network_object__()
     output.within_degrees.average.network = sum(sum(M)) / len(M)
     output.within_degrees.average.core = sum(sum(MC)) / len(MC)
     output.within_degrees.average.periphery = sum(sum(MP)) / len(MP)
     
-    output.within_degrees.min = network_object()
+    output.within_degrees.min = __network_object__()
     output.within_degrees.min.network = min(sum(M))
     output.within_degrees.min.core = min(sum(MC))
     output.within_degrees.min.periphery = min(sum(MP))
     
-    output.within_degrees.max = network_object()
+    output.within_degrees.max = __network_object__()
     output.within_degrees.max.network = max(sum(M))
     output.within_degrees.max.core = max(sum(MC))
     output.within_degrees.max.periphery = max(sum(MP))
     
-    output.total_degrees.average = network_object()
+    output.total_degrees.average = __network_object__()
     output.total_degrees.average.network = output.within_degrees.average.network
     output.total_degrees.average.core = sum([sum(M)[c] for c in c_ids]) / len(c_ids)
     output.total_degrees.average.periphery = sum([sum(M)[p] for p in p_ids]) / len(p_ids)
     
-    output.total_degrees.min = network_object()
+    output.total_degrees.min = __network_object__()
     output.total_degrees.min.network = output.within_degrees.min.network
     output.total_degrees.min.core = min([sum(M)[c] for c in c_ids])
     output.total_degrees.min.periphery = min([sum(M)[p] for p in p_ids])
 
-    output.total_degrees.max = network_object()
+    output.total_degrees.max = __network_object__()
     output.total_degrees.max.network = output.within_degrees.max.network
     output.total_degrees.max.core = max([sum(M)[c] for c in c_ids])
     output.total_degrees.max.periphery = max([sum(M)[p] for p in p_ids])
 
     # Number of connected components
     
-    output.components = network_object()
-    output.components.network = nx.number_connected_components(nx.Graph(M))
-    output.components.core = nx.number_connected_components(nx.Graph(MC))
-    output.components.periphery = nx.number_connected_components(nx.Graph(MP))
+    output.components = __network_object__()
+    output.components.network = __nx__.number_connected_components(__nx__.Graph(M))
+    output.components.core = __nx__.number_connected_components(__nx__.Graph(MC))
+    output.components.periphery = __nx__.number_connected_components(__nx__.Graph(MP))
     
     # Radius and diameter
     
-    output.radius = network_object()
-    output.diameter = network_object()
+    output.radius = __network_object__()
+    output.diameter = __network_object__()
     
     if output.components.network != 1:
         
@@ -632,8 +632,8 @@ def cpip_stats(filepath, core):
         
     else:
         
-        output.radius.network = nx.radius(nx.Graph(M))
-        output.diameter.network = nx.diameter(nx.Graph(M))
+        output.radius.network = __nx__.radius(__nx__.Graph(M))
+        output.diameter.network = __nx__.diameter(__nx__.Graph(M))
     
     if output.components.core != 1:
         
@@ -642,8 +642,8 @@ def cpip_stats(filepath, core):
         
     else:
         
-        output.radius.core = nx.radius(nx.Graph(MC))
-        output.diameter.core = nx.diameter(nx.Graph(MC))
+        output.radius.core = __nx__.radius(__nx__.Graph(MC))
+        output.diameter.core = __nx__.diameter(__nx__.Graph(MC))
         
     if output.components.periphery != 1:
         
@@ -652,28 +652,28 @@ def cpip_stats(filepath, core):
         
     else:
         
-        output.radius.periphery = nx.radius(nx.Graph(MP))
-        output.diameter.periphery = nx.diameter(nx.Graph(MP))
+        output.radius.periphery = __nx__.radius(__nx__.Graph(MP))
+        output.diameter.periphery = __nx__.diameter(__nx__.Graph(MP))
     
     # Maximium clique size
     
-    output.clique = network_object()
-    output.clique.network = len(max(nx.find_cliques(nx.Graph(M))))
-    output.clique.core = len(max(nx.find_cliques(nx.Graph(MC))))
-    output.clique.periphery = len(max(nx.find_cliques(nx.Graph(MP))))
+    output.clique = __network_object__()
+    output.clique.network = len(max(__nx__.find_cliques(__nx__.Graph(M))))
+    output.clique.core = len(max(__nx__.find_cliques(__nx__.Graph(MC))))
+    output.clique.periphery = len(max(__nx__.find_cliques(__nx__.Graph(MP))))
     
     # Global clustering
     
-    output.clustering = network_object()
-    output.clustering.network = nx.average_clustering(nx.Graph(M))
-    output.clustering.core = nx.average_clustering(nx.Graph(MC))
-    output.clustering.periphery = nx.average_clustering(nx.Graph(MP))
+    output.clustering = __network_object__()
+    output.clustering.network = __nx__.average_clustering(__nx__.Graph(M))
+    output.clustering.core = __nx__.average_clustering(__nx__.Graph(MC))
+    output.clustering.periphery = __nx__.average_clustering(__nx__.Graph(MP))
     
     # Connectivity statistics
     
-    output.connectivity = network_object()
-    output.edge_connectivity = network_object()
-    output.algebraic_connectivity = network_object()
+    output.connectivity = __network_object__()
+    output.edge_connectivity = __network_object__()
+    output.algebraic_connectivity = __network_object__()
     
     if output.components.network > 1:
         
@@ -682,8 +682,8 @@ def cpip_stats(filepath, core):
         
     else:
         
-        output.connectivity.network = nx.node_connectivity(nx.Graph(M))
-        output.edge_connectivity.network = nx.edge_connectivity(nx.Graph(M))
+        output.connectivity.network = __nx__.node_connectivity(__nx__.Graph(M))
+        output.edge_connectivity.network = __nx__.edge_connectivity(__nx__.Graph(M))
     
     if output.components.core > 1:
         
@@ -692,8 +692,8 @@ def cpip_stats(filepath, core):
         
     else:
         
-        output.connectivity.core = nx.node_connectivity(nx.Graph(MC))
-        output.edge_connectivity.core = nx.edge_connectivity(nx.Graph(MC))
+        output.connectivity.core = __nx__.node_connectivity(__nx__.Graph(MC))
+        output.edge_connectivity.core = __nx__.edge_connectivity(__nx__.Graph(MC))
     
     if output.components.periphery > 1:
         
@@ -702,45 +702,45 @@ def cpip_stats(filepath, core):
         
     else:
         
-        output.connectivity.periphery = nx.node_connectivity(nx.Graph(MP))
-        output.edge_connectivity.periphery = nx.edge_connectivity(nx.Graph(MP))
+        output.connectivity.periphery = __nx__.node_connectivity(__nx__.Graph(MP))
+        output.edge_connectivity.periphery = __nx__.edge_connectivity(__nx__.Graph(MP))
     
-    output.algebraic_connectivity.network = nx.algebraic_connectivity(nx.Graph(M))
-    output.algebraic_connectivity.core = nx.algebraic_connectivity(nx.Graph(MC))
-    output.algebraic_connectivity.periphery = nx.algebraic_connectivity(nx.Graph(MP))
+    output.algebraic_connectivity.network = __nx__.algebraic_connectivity(__nx__.Graph(M))
+    output.algebraic_connectivity.core = __nx__.algebraic_connectivity(__nx__.Graph(MC))
+    output.algebraic_connectivity.periphery = __nx__.algebraic_connectivity(__nx__.Graph(MP))
     
     # Energies and Laplacian energies
     
-    output.energy = network_object()
-    output.laplacian_energy = network_object()
+    output.energy = __network_object__()
+    output.laplacian_energy = __network_object__()
     
-    output.energy.network = sum(abs(nx.adjacency_spectrum(nx.Graph(M))))
-    output.energy.core = sum(abs(nx.adjacency_spectrum(nx.Graph(MC))))
-    output.energy.periphery = sum(abs(nx.adjacency_spectrum(nx.Graph(MP))))
+    output.energy.network = sum(abs(__nx__.adjacency_spectrum(__nx__.Graph(M))))
+    output.energy.core = sum(abs(__nx__.adjacency_spectrum(__nx__.Graph(MC))))
+    output.energy.periphery = sum(abs(__nx__.adjacency_spectrum(__nx__.Graph(MP))))
     
-    output.laplacian_energy.network = sum(abs(nx.laplacian_spectrum(nx.Graph(M))))
-    output.laplacian_energy.core = sum(abs(nx.laplacian_spectrum(nx.Graph(MC))))
-    output.laplacian_energy.periphery = sum(abs(nx.laplacian_spectrum(nx.Graph(MP))))
+    output.laplacian_energy.network = sum(abs(__nx__.laplacian_spectrum(__nx__.Graph(M))))
+    output.laplacian_energy.core = sum(abs(__nx__.laplacian_spectrum(__nx__.Graph(MC))))
+    output.laplacian_energy.periphery = sum(abs(__nx__.laplacian_spectrum(__nx__.Graph(MP))))
     
     # Transitivity
     
-    output.transitivity = network_object()
-    output.transitivity.network = nx.transitivity(nx.Graph(M))
-    output.transitivity.core = nx.transitivity(nx.Graph(MC))
-    output.transitivity.periphery = nx.transitivity(nx.Graph(MP))
+    output.transitivity = __network_object__()
+    output.transitivity.network = __nx__.transitivity(__nx__.Graph(M))
+    output.transitivity.core = __nx__.transitivity(__nx__.Graph(MC))
+    output.transitivity.periphery = __nx__.transitivity(__nx__.Graph(MP))
     
     # Wiener index
     
-    output.wiener = network_object()
-    output.wiener.network = nx.wiener_index(nx.Graph(M))
-    output.wiener.core = nx.wiener_index(nx.Graph(MC))
-    output.wiener.periphery = nx.wiener_index(nx.Graph(MP))
+    output.wiener = __network_object__()
+    output.wiener.network = __nx__.wiener_index(__nx__.Graph(M))
+    output.wiener.core = __nx__.wiener_index(__nx__.Graph(MC))
+    output.wiener.periphery = __nx__.wiener_index(__nx__.Graph(MP))
     
     # Check if the core is a dominating set
     
-    output.dom_set = network_object()
-    output.dom_set.core = nx.is_dominating_set(nx.Graph(M), c_ids)
-    output.dom_set.periphery = nx.is_dominating_set(nx.Graph(M), p_ids)
+    output.dom_set = __network_object__()
+    output.dom_set.core = __nx__.is_dominating_set(__nx__.Graph(M), c_ids)
+    output.dom_set.periphery = __nx__.is_dominating_set(__nx__.Graph(M), p_ids)
     
     return output
 
@@ -748,7 +748,7 @@ def cpip_stats(filepath, core):
     
 # A helper function for printing the table in cpip_summary
 
-def table_helper(ids):
+def __table_helper__(ids):
     
     if ids == [0]:
         
@@ -844,7 +844,7 @@ def cpip_summary(output):
         elif ('inf' in results[i]) and (stat_names[i] != 'Wiener Index'):
             
             ids = [idx for idx in range(3) if results[i][idx] == 'inf']
-            print(table_helper(ids).format(stat_names[i], results[i][1], results[i][2], results[i][0]))
+            print(__table_helper__(ids).format(stat_names[i], results[i][1], results[i][2], results[i][0]))
             
         elif stat_names[i] in ['Order', 'Size', 'Min Degree - Total', 'Max Degree - Total', 'Min Degree - Within',
                        'Max Degree - Within', '# Components', 'Clique Number', 'Connectivity', 'Edge Connectivity',
