@@ -3,7 +3,7 @@
 # The input must be a (weighted) adjacency matrix for a network
 
 # Import required modules
-    
+
 import pulp as __pulp__
 import numpy as __np__
 import pandas as __pd__
@@ -62,13 +62,15 @@ def cpip(filepath, theta, psi, loops = None):
             
             W[W.columns[i]][i] = 0
     
-    # Remove all isolated vertices from the data set to be safe
+    # Ensure that the network is connected - find largest connected component
     
-    isolates = [idx for idx in range(len(W)) if sum(W[W.columns[idx]]) == 0]
+    G = __nx__.Graph(W.values)
+    keep = list(max(__nx__.connected_components(G), key = len))
+    remove = [i for i in range(len(G)) if i not in keep]
     
-    for iso in [isolates[len(isolates)-1-i] for i in range(len(isolates))]:
+    for r in [remove[len(remove)-1-i] for i in range(len(remove))]:
         
-        W = W.drop(W.columns[iso], axis = 1).drop(iso, axis = 0)
+        W = W.drop(W.columns[r], axis = 1).drop(r, axis = 0)
     
     W2 = W.set_index(__pd__.Index([i for i in range(len(W))]))
     cols = W.columns
@@ -255,13 +257,15 @@ def cpip_exploratory(filepath, theta, loops = None):
             
             W[W.columns[i]][i] = 0
     
-    # Remove all isolated vertices from the data set to be safe
+    # Ensure that the network is connected - find largest connected component
     
-    isolates = [idx for idx in range(len(W)) if sum(W[W.columns[idx]]) == 0]
+    G = __nx__.Graph(W.values)
+    keep = list(max(__nx__.connected_components(G), key = len))
+    remove = [i for i in range(len(G)) if i not in keep]
     
-    for iso in [isolates[len(isolates)-1-i] for i in range(len(isolates))]:
+    for r in [remove[len(remove)-1-i] for i in range(len(remove))]:
         
-        W = W.drop(W.columns[iso], axis = 1).drop(iso, axis = 0)
+        W = W.drop(W.columns[r], axis = 1).drop(r, axis = 0)
     
     cols = W.columns
     W = W.values
