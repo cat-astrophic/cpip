@@ -37,7 +37,7 @@
 * And if you want the table in tex formatting:
    * cpip_summary_tex(output)
 
-* A paper introducing the method used in cpip along with the included examples is currently undergoing peer review at *Social Networks*.
+<!-- * A paper introducing the method used in cpip along with the included examples is currently undergoing peer review at *Social Networks*. -->
 
 <!-- solves an initial linear program (display below) -->
 
