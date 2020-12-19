@@ -12,7 +12,7 @@
     * **pandas** for data manipulation
     * **numpy** for data manipulation
 
-* To use cpip within your own python code include the following line at the beginning of your code:
+* To use cpip within your own python code include the following line at the beginning of your code (note that for now you will need to save the file *cpip.py* to your working directory as several major add-ons are currently in the works):
    * from cpip import *
 
 * Once that line of code is included you can find the core of a network by defining variable *filepath* which containts the location of a csv file containing the weighted adjacency matrix for your network, by specifying values for the parameters *theta* and *psi*, and then running the following line of code:
