@@ -14,7 +14,7 @@ from cpip import *
 
 # Locating the data for years 2010 - 2019
 
-data_path = 'C:/Users/User/Documents/Data/MDPI/'
+data_path = 'C:/Users/User/Documents/Data/cpip_test/'
 files = ['M_' + str(i) + '.csv' for i in range(2010,2020)]
 
 # Main loop
@@ -56,6 +56,6 @@ latlon = [[-12.4,17.4], [-23.9,22.7], [-26.4,31.6], [-29.6,28.1], [-13,33.8],
 rpos = [[coord[1],coord[0]] for coord in latlon]
 nx.draw(rg, rpos, width = rwidths, node_color = cm(2/3))
 plt.title('International Collaborations\nAcross Southern Africa', loc = 'center', fontsize = 20, color = 'black')
-plt.savefig('C:/Users/User/Documents/Data/cpip_tests/collaborations_example.eps')
+plt.savefig('C:/Users/User/Documents/Data/cpip_test/collaborations_example.eps')
 plt.show()
 
