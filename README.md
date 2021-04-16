@@ -21,7 +21,7 @@
 * If your network has loops and you wish to consider this data, you can simply set *loops = True* as an argument in cpip:
    * core = cpip(filepath, theta, psi, loops = True)
  
-* If you would like to visualize your network, its core, and its periphey, once you have run cpip you can use hte cpip_viz function:
+* If you would like to visualize your network, its core, and its periphey, once you have run cpip you can use the cpip_viz function:
    * cpip_viz(filename, core)
 
 * If you want to add text labels to the visuzlization of the core, cpip_viz will let you use the column headings from your data file with the core_labels argument as follows:
