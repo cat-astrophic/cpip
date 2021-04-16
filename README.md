@@ -15,7 +15,7 @@
 * To use cpip within your own python code include the following line at the beginning of your code (note that for now you will need to save the file *cpip.py* to your working directory as several major ongoing additions need to be finished before this is packaged):
    * from cpip import *
 
-* Once that line of code is included you can find the core of a network by defining variable *filepath* which containts the location of a csv file containing the weighted adjacency matrix for your network, by specifying values for the parameters *theta* and *psi*, and then running the following line of code:
+* Once that line of code is included you can find the core of a network by defining the variable *filepath* which containts the location of a csv file containing the weighted adjacency matrix for your network, by specifying values for the parameters *theta* and *psi*, and then running the following line of code:
    * core = cpip(filepath, theta, psi)
 
 * If your network has loops and you wish to consider this data, you can simply set *loops = True* as an argument in cpip:
