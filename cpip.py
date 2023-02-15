@@ -17,8 +17,14 @@ from matplotlib import pyplot as __plt__
 
 def __pulp_names__(string):
     
-    string_list = list(string)
-    
+    try:
+        
+        string_list = list(string)
+        
+    except:
+        
+        string_list = 'x' + str(string)
+        
     for s in range(len(string_list)):
         
         if string_list[s].isalnum() == False:
@@ -33,7 +39,201 @@ def __pulp_names__(string):
 
 # Defining the main function
 
-def cpip(filepath, theta, psi, loops = None):
+def cpip(A, theta, psi, loops = None):
+    
+    # Safety feature for user error
+    
+    theta = max(theta,1)
+    psi = max(psi,1)
+    
+    # Convert numpy matrix to pandas dataframe
+    
+    W = __pd__.DataFrame(A)
+    
+    # Rename columns to match pulp formatting
+    
+    cc = list(W.columns)
+    
+    for c in range(len(cc)):
+        
+        cc[c] = __pulp_names__(cc[c])
+        
+    W.columns = cc
+    
+    # Remove loops (self interactions) if loops != True
+    
+    if loops != True:
+        
+        for i in range(len(W)):
+            
+            W[W.columns[i]][i] = 0
+    
+    # Ensure that the network is connected - find largest connected component
+    
+    G = __nx__.Graph(W.values)
+    keep = list(max(__nx__.connected_components(G), key = len))
+    remove = [i for i in range(len(G)) if i not in keep]
+    
+    for r in [remove[len(remove)-1-i] for i in range(len(remove))]:
+        
+        W = W.drop(W.columns[r], axis = 1).drop(r, axis = 0)
+    
+    W2 = W.set_index(__pd__.Index([i for i in range(len(W))]))
+    cols = W.columns
+    W = W.values
+    
+    # Create the vectors c and b
+    
+    c = __np__.diag(__np__.matmul(W,__np__.ones((len(W),len(W)))))
+    b = (len(W)-1)*__np__.ones(len(W))
+    
+    # Create the matrix A
+    
+    # Create a binary adjacency matrix
+    
+    M = __np__.zeros((len(W),len(W)))
+    
+    for row in range(len(W)):
+        
+        for col in range(len(W)):
+            
+            if W[row][col] > 0:
+                
+                M[row][col] = 1
+   
+    # Feed this matrix into networkx and create the distance matrix D
+    
+    G = __nx__.Graph(M)
+    D = __np__.zeros((len(W),len(W)))
+    
+    for row in range(len(D)):
+        
+        for col in range(len(D)):
+            
+            if (col > row) and D[row][col] == 0:
+                
+                D[row][col] = __nx__.shortest_path_length(G, row, col)
+    
+    D = D + __np__.transpose(D)
+    A = __np__.diag(__np__.matmul(D,__np__.ones(len(W))))
+    
+    # Solve the program
+    
+    problem = __pulp__.LpProblem('Core-Periphery Network Model', __pulp__.LpMaximize)
+        
+    # Initialize a list of choice variables
+    
+    x = [__pulp__.LpVariable(col, lowBound = 0, upBound = 1, cat = 'Integer') for col in cols]
+    
+    # Define the objective function
+    
+    problem += __pulp__.lpSum([c[i]*x[i] for i in range(len(c))])
+    
+    # Constraints
+    
+    for row in range(len(A)):
+        
+        problem += __pulp__.lpSum([A[row][i]*x[i] for i in range(len(A))]) <= theta*b[row]
+        
+    # Solve this problem
+    
+    problem.solve()
+    
+    # Create the truncated data
+    
+    # Create a reference list of nations which were in the solution to part 1
+    
+    subset = []
+    
+    for var in problem.variables():
+        
+        if var.varValue > 0:
+            
+            subset.append(str(var))
+        
+    # Continue this process if the first stage optimization problem yields at least two potential members of the core
+
+    if (len(subset) < 2) or (theta == 1):
+        
+        return subset
+    
+    else:
+        
+        # Iteratively create new networks and solve corresponding optimization problems
+        
+        idxset = [list(W2.columns).index(sub) for sub in subset] # indices of core candidate vertices
+        dropset = [b for b in range(len(W2.columns)) if b not in idxset] # remaining indices
+        Dx = __pd__.DataFrame(D, columns = W2.columns)
+        
+        for idx in [dropset[len(dropset)-1-i] for i in range(len(dropset))]:
+
+            Dx = Dx.drop(Dx.columns[idx], axis = 1).drop(idx, axis = 0)
+
+        # Running the loop to find the optimal core
+        
+        val = 0
+        core = []
+        
+        for a in range(1,len(subset)+1):
+            
+            # Generate all a-tuples
+            
+            tuples = list(__it__.combinations(idxset, a))
+            
+            # Check all combinations
+            
+            for t in tuples:
+                
+                tuple_ids = [t_id for t_id in t]
+                drops = [k for k in list(Dx.index.values) if k not in tuple_ids]
+                Dxa = Dx
+                cxa = list(c)
+                
+                # Create the new matrices and vectors
+                
+                for ids in [drops[len(drops)-1-i] for i in range(len(drops))]:
+                    
+                    Dxa = Dxa.drop(W2.columns[ids], axis = 1).drop(ids, axis = 0)
+                    cxa.pop(ids)
+                
+                Axa = Dxa.values                
+                bxa = __np__.ones(len(Axa))
+                
+                # Define the problem
+                
+                prob = __pulp__.LpProblem('Core-Periphery Network Model', __pulp__.LpMaximize)
+                
+                # Initialize a list of choice variables
+                
+                y = [__pulp__.LpVariable(col, lowBound = 0, upBound = 1, cat = 'Integer') for col in Dxa.columns]
+                
+                # Define the objective function
+                
+                prob += __pulp__.lpSum([cxa[i]*y[i] for i in range(len(Dxa))])
+                
+                # Constraints
+                
+                for row in range(len(Axa)):
+                
+                    prob += __pulp__.lpSum([Axa[row][i]*y[i] for i in range(len(Axa))]) <= (a-1)*psi*bxa[row]
+                
+                # Solve the problem
+                
+                prob.solve()
+                
+                # Check to see if this is the new optimum
+                
+                if str(type(__pulp__.value(prob.objective))) != "<class 'NoneType'>":
+
+                    if __pulp__.value(prob.objective) > val and len([str(v) for v in prob.variables() if v.varValue > 0]) == a:
+
+                        val, core = __pulp__.value(prob.objective), [str(v) for v in prob.variables() if v.varValue > 0]
+        
+        return core
+
+# Defining a version that reads in a csv from a given filepath
+
+def cpip_fp(filepath, theta, psi, loops = None):
     
     # Safety feature for user error
     
