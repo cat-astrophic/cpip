@@ -34,7 +34,6 @@ locs_kc = [drawer(node_ec_kc[x]) for x in range(len(KCG.nodes()))]
 pos_kc = dict(zip(KCG.nodes(), locs_kc))
 
 pos_kk = nx.spring_layout(KKG, seed = 41)
-pos_kk2 = nx.spring_layout(KKG, seed = 85)
 
 # Maximum clique method :: C_KC = {0,1,2,3,13}; C_KK = {0,2,3,5}
 
@@ -150,10 +149,6 @@ nx.draw_networkx(KKG, node_color = kkg_node_color, pos = pos_kk)
 nx.draw_networkx(KCG, node_color = kc1630_node_color, pos = pos_kc)
 nx.draw_networkx(KCG, node_color = kc1830_node_color, pos = pos_kc)
 nx.draw_networkx(KCG, node_color = kc2030_node_color, pos = pos_kc)
-
-nx.draw_networkx(KKG, node_color = kk1630_node_color, pos = pos_kk2)
-nx.draw_networkx(KKG, node_color = kk1830_node_color, pos = pos_kk2)
-nx.draw_networkx(KKG, node_color = kk2030_node_color, pos = pos_kk2)
 
 nx.draw_networkx(KKG, node_color = kk1630_node_color, pos = pos_kk)
 nx.draw_networkx(KKG, node_color = kk1830_node_color, pos = pos_kk)
