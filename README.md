@@ -44,3 +44,27 @@
 <!-- loops through (show loop) -->
 
 <!-- reference to pulp? -->
+
+# Citation
+
+### APA:
+
+Cary, M. (2023). Core-periphery models via integer programming: Maximizing the influence of the core. Computational and Applied Mathematics, 42(4), 162.
+
+### MLA:
+
+Cary, Michael. "Core-periphery models via integer programming: Maximizing the influence of the core." Computational and Applied Mathematics 42.4 (2023): 162.
+
+### Bibtex:
+
+@article{cary2023core,\
+&nbsp;&nbsp;&nbsp;&nbsp;title={Core-periphery models via integer programming: maximizing the influence of the core},\
+&nbsp;&nbsp;&nbsp;&nbsp;author={Cary, Michael},\
+&nbsp;&nbsp;&nbsp;&nbsp;journal={Computational and Applied Mathematics},\
+&nbsp;&nbsp;&nbsp;&nbsp;volume={42},\
+&nbsp;&nbsp;&nbsp;&nbsp;number={4},\
+&nbsp;&nbsp;&nbsp;&nbsp;pages={162},\
+&nbsp;&nbsp;&nbsp;&nbsp;year={2023},\
+&nbsp;&nbsp;&nbsp;&nbsp;publisher={Springer}\
+}
+
