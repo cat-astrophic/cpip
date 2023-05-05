@@ -2,6 +2,8 @@
 
 * cpip is an in-development project which identifies the core of a network by using a paramterized algorithmic approach which solves a series of integer programs
 
+The paper has been published in [*Computational and Applied Mathematics*](https://link.springer.com/article/10.1007/s40314-023-02299-6).
+
 * cpip uses only two parameters: one which places a constraint on the centrality of the core within the network, and one which puts a constraint on the density of the core
 
 * cpip requires the following modules
